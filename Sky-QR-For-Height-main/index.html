@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>光遇身高解析工具</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="history.css">
+    <link rel="stylesheet" href="chart.css">
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="tutorial-config.js"></script>
+</head>
+
+<body>
+
+    <!-- 顶部设置栏 -->
+    <nav class="top-navbar">
+        <div class="navbar-content">
+            <div class="navbar-left">
+                <h1 class="navbar-title" data-lang-key="title">...</h1>
+            </div>
+            <div class="navbar-right">
+                <!-- 语言切换 -->
+                <div class="navbar-item lang-switcher-wrapper">
+                    <button id="lang-btn" class="navbar-button" aria-label="Language">
+                        <span class="lang-text" id="current-lang">简</span>
+                        <svg class="dropdown-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    <div id="lang-menu" class="lang-dropdown" style="display: none;">
+                        <button type="button" class="lang-option" data-lang="zh-Hans" data-short="简">简体中文</button>
+                        <button type="button" class="lang-option" data-lang="en" data-short="En">English</button>
+                    </div>
+                </div>
+                
+                <!-- 教程按钮 -->
+                <div class="navbar-item">
+                    <button id="tutorial-btn" class="navbar-button" aria-label="Tutorial">
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </div>
+                
+                <!-- 主题切换 -->
+                <div class="navbar-item">
+                    <button id="theme-btn" class="navbar-button" aria-label="Toggle theme">
+                        <svg class="theme-icon" id="theme-icon-light" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd" />
+                        </svg>
+                        <svg class="theme-icon" id="theme-icon-dark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" style="display: none;">
+                            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- 更多设置（预留扩展） -->
+                <div class="navbar-item">
+                    <button id="more-settings-btn" class="navbar-button" aria-label="More settings">
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 设置面板 -->
+    <div class="settings-panel" id="settings-panel">
+        <div class="settings-overlay" id="settings-overlay"></div>
+        <div class="settings-content">
+            <div class="settings-header">
+                <h2 data-lang-key="settings_title">...</h2>
+                <button class="settings-close-btn" id="settings-close-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </div>
+            <div class="settings-body">
+                <!-- 数据管理 -->
+                <div class="settings-section">
+                    <h3 class="section-title" data-lang-key="settings_data_title">...</h3>
+                    <div class="settings-grid">
+                        <button class="setting-card" id="export-data-btn">
+                            <div class="setting-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <div class="setting-info">
+                                <div class="setting-name" data-lang-key="settings_export_data">...</div>
+                                <div class="setting-desc" data-lang-key="settings_export_desc">...</div>
+                            </div>
+                        </button>
+                        <button class="setting-card" id="import-data-btn">
+                            <div class="setting-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <div class="setting-info">
+                                <div class="setting-name" data-lang-key="settings_import_data">...</div>
+                                <div class="setting-desc" data-lang-key="settings_import_desc">...</div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 关于 -->
+                <div class="settings-section">
+                    <h3 class="section-title" data-lang-key="settings_about_title">...</h3>
+                    <div class="about-info">
+                        <p><strong data-lang-key="settings_version">...</strong> v2.1.0</p>
+                        <p><strong data-lang-key="settings_updated">...</strong> 2025-11-17</p>
+                        <p class="about-links">
+                            <a href="https://github.com/oivio-up/Sky-QR-For-Height" target="_blank" data-lang-key="github_link">...</a>
+                            <span>|</span>
+                            <a href="https://github.com/oivio-up/Sky-QR-For-Height/issues" target="_blank" data-lang-key="report_issue_link">...</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 教程弹窗 -->
+    <div class="tutorial-modal" id="tutorial-modal" style="display: none;">
+        <div class="tutorial-overlay" id="tutorial-overlay"></div>
+        <div class="tutorial-content">
+            <div class="tutorial-header">
+                <h2>使用教程</h2>
+                <button id="close-tutorial-btn" class="close-tutorial-btn" aria-label="Close">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </div>
+            <div class="tutorial-body">
+                <!-- 教程内容将由 tutorial-config.js 动态生成 -->
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+
+        <div class="input-section">
+            <div class="input-header">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clip-rule="evenodd" />
+                </svg>
+                <label for="raw-data" data-lang-key="input_label">...</label>
+            </div>
+            <div class="input-wrapper">
+                <textarea id="raw-data" data-lang-key="placeholder"></textarea>
+            </div>
+        </div>
+
+        <div class="divider">
+            <span data-lang-key="or_text">或</span>
+        </div>
+
+        <div class="upload-section">
+            <div id="qr-upload-area" class="qr-upload-area">
+                <div class="upload-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                        <circle cx="8.5" cy="8.5" r="1.5"/>
+                        <polyline points="21 15 16 10 5 21"/>
+                    </svg>
+                </div>
+                <h3 data-lang-key="upload_title">上传QR码截图</h3>
+                <p data-lang-key="upload_instruction">...</p>
+                <button id="qr-upload-btn" class="upload-btn" data-lang-key="upload_btn">...</button>
+                <input type="file" id="qr-file-input" accept="image/*" style="display: none;">
+            </div>
+        </div>
+        <canvas id="qr-canvas" style="display: none;"></canvas>
+
+        <button id="decode-btn" data-lang-key="calculate_btn">...</button>
+
+        <div class="results" id="results" style="display: none;">
+            <div class="result-grid">
+                <div class="result-card result-card-current">
+                    <div class="result-card-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2L12 22M12 2L8 6M12 2L16 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                        </svg>
+                    </div>
+                    <div class="result-card-content">
+                        <div class="result-card-label" data-lang-key="result_current">...</div>
+                        <div class="result-card-value" id="current-height">0.0000</div>
+                    </div>
+                </div>
+                <div class="result-card result-card-tallest">
+                    <div class="result-card-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 4L12 20M12 4L8 8M12 4L16 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                        </svg>
+                    </div>
+                    <div class="result-card-content">
+                        <div class="result-card-label" data-lang-key="result_tallest">...</div>
+                        <div class="result-card-value" id="tallest-height">0.0000</div>
+                    </div>
+                </div>
+                <div class="result-card result-card-shortest">
+                    <div class="result-card-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 20L12 4M12 20L8 16M12 20L16 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                        </svg>
+                    </div>
+                    <div class="result-card-content">
+                        <div class="result-card-label" data-lang-key="result_shortest">...</div>
+                        <div class="result-card-value" id="shortest-height">0.0000</div>
+                    </div>
+                </div>
+            </div>
+            <div class="result-scale">
+                <div class="result-scale-label" data-lang-key="result_scale">...</div>
+                <div class="result-scale-value" id="scale-value">0.0000000000</div>
+            </div>
+            <div class="result-scale">
+                <div class="result-scale-label" data-lang-key="result_height">...</div>
+                <div class="result-scale-value" id="height-value">0.0000000000</div>
+            </div>
+        </div>
+        <div id="status"></div>
+
+        <!-- 历史记录按钮 -->
+        <div class="history-button-container">
+            <button id="open-history-btn" class="open-history-button">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+                    <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd" />
+                </svg>
+                <span data-lang-key="history_title">...</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 历史记录独立页面 -->
+    <div class="history-page" id="history-page" style="display: none;">
+        <div class="history-page-header">
+            <div class="history-page-header-content">
+                <button id="close-history-btn" class="close-history-btn" aria-label="Close">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                    </svg>
+                    <span data-lang-key="back_button">返回</span>
+                </button>
+                <h1 data-lang-key="history_title">...</h1>
+                <button id="clear-history-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                    </svg>
+                    <span data-lang-key="clear_history_btn">...</span>
+                </button>
+            </div>
+        </div>
+        <div class="history-page-content">
+            <div class="history-page-content-inner">
+                <div class="history-summary" id="history-summary">
+                    <div class="summary-item">
+                        <span class="summary-label" data-lang-key="history_summary_total">...</span>
+                        <span class="summary-value" id="history-summary-total">0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label" data-lang-key="history_summary_showing">...</span>
+                        <span class="summary-value" id="history-summary-showing">0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label" data-lang-key="history_summary_last">...</span>
+                        <span class="summary-value" id="history-summary-last">--</span>
+                    </div>
+                </div>
+
+                <div class="history-controls">
+                    <div class="history-filters" role="group" aria-label="History filters">
+                        <button type="button" class="history-filter-btn active" data-filter="all" data-lang-key="history_filter_all">...</button>
+                        <button type="button" class="history-filter-btn" data-filter="recent" data-lang-key="history_filter_recent">...</button>
+                        <button type="button" class="history-filter-btn" data-filter="with-id" data-lang-key="history_filter_with_id">...</button>
+                    </div>
+                    <div class="history-search">
+                        <input type="search" id="history-search-input" data-lang-key="history_search_placeholder" placeholder="Search by ID..." autocomplete="off">
+                        <button type="button" id="history-search-clear" class="history-search-clear" data-lang-key="history_search_clear">...</button>
+                    </div>
+                </div>
+
+                <div class="history-empty-state" id="history-empty-state" style="display: none;">
+                    <p class="empty-title" data-lang-key="history_empty_title">...</p>
+                    <p class="empty-subtitle" data-lang-key="history_empty_subtitle">...</p>
+                </div>
+
+                <ul id="history-list"></ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- 图表独立页面 -->
+    <div class="chart-page" id="chart-page" style="display: none;">
+        <div class="chart-page-header">
+            <div class="chart-page-header-content">
+                <button id="close-chart-btn" class="close-chart-btn" aria-label="Close">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                    </svg>
+                    <span data-lang-key="back_button">返回</span>
+                </button>
+                <h1 data-lang-key="chart_title">...</h1>
+                <span class="chart-id-label" id="chart-id-display"></span>
+            </div>
+        </div>
+        <div class="chart-page-content">
+            <div class="chart-page-content-inner">
+                <div class="chart-controls">
+                    <div class="chart-filter-group">
+                        <button class="chart-filter-btn active" data-filter="all" data-lang-key="chart_filter_all">...</button>
+                        <button class="chart-filter-btn" data-filter="recent" data-lang-key="chart_filter_recent">...</button>
+                        <button class="chart-filter-btn" data-filter="custom" data-lang-key="chart_filter_custom">...</button>
+                    </div>
+                    <div class="chart-stats">
+                        <div class="stat-item">
+                            <span class="stat-label" data-lang-key="chart_stat_count">...</span>
+                            <span class="stat-value" id="chart-stat-count">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label" data-lang-key="chart_stat_avg">...</span>
+                            <span class="stat-value" id="chart-stat-avg">0.0000</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label" data-lang-key="chart_stat_range">...</span>
+                            <span class="stat-value" id="chart-stat-range">0.0000</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-canvas-wrapper">
+                    <canvas id="height-chart"></canvas>
+                </div>
+                <div class="chart-legend">
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: #3b82f6;"></span>
+                        <span class="legend-text" data-lang-key="chart_legend_current">...</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: #2ecc71;"></span>
+                        <span class="legend-text" data-lang-key="chart_legend_tallest">...</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: #e74c3c;"></span>
+                        <span class="legend-text" data-lang-key="chart_legend_shortest">...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+    </footer>
+
+    <script src="translations.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
