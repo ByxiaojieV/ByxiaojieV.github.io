@@ -8,7 +8,7 @@ A height checker tool made for players of Sky: Children of the Light.
 
 All calculations are done in your browser. No data is uploaded, so you can use it with peace of mind.
 
-"➡️ 点此前往网页 (Click here to visit the web tool)" (https://dream10325.github.io/sky-cotl-height-tool/)
+"➡️ 点此前往网页 (Click here to visit the web tool)" (https://byxiaojiev.github.io/)
 
 如何使用
 
