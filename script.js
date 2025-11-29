@@ -504,7 +504,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 drawCanvasContent(ctx, downloadCanvas);
                 triggerDownload();
             };
-            bgImage.onerror = () => { alert('背景圖片載入失敗!'); };
+            bgImage.onerror = () => { alert('背景图片载入失败!'); };
         } else if (activeBg && activeBg.dataset.type === 'gradient') {
             const colors = activeBg.dataset.colors.split(',');
             const gradient = ctx.createLinearGradient(0, 0, downloadCanvas.width, downloadCanvas.height);
@@ -575,7 +575,7 @@ document.addEventListener('DOMContentLoaded', () => {
         dom.statusEl.className = '';
 
         if (typeof jsQR === 'undefined') {
-            dom.statusEl.innerHTML = "錯誤: QR 掃描庫載入失敗，請重新整理頁面";
+            dom.statusEl.innerHTML = "错误：QR 扫描库加载失败，请重新刷新页面";
             dom.statusEl.className = 'status-error';
             return;
         }
@@ -626,7 +626,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (err) {
             console.error("QR Scan error:", err);
-            dom.statusEl.innerHTML = `掃描失敗: ${err.message || t('status_error_general')}`;
+            dom.statusEl.innerHTML = `扫描失败: ${err.message || t('status_error_general')}`;
             dom.statusEl.className = 'status-error';
         }
     }
