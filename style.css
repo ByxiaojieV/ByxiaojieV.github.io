@@ -769,3 +769,55 @@ html[data-theme='dark'] .extreme-notice {
     width: 100%;
     box-sizing: border-box;
 }
+/* 指令图片样式 */
+.instruction-images {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin: 15px 0;
+    align-items: center;
+}
+
+.instruction-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px var(--shadow-color);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.instruction-image:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+/* 响应式设计 - 针对大屏幕优化显示 */
+@media (min-width: 768px) {
+    .instruction-image {
+        max-width: 600px; /* 在较大屏幕上限制最大宽度 */
+    }
+}
+
+@media (min-width: 1200px) {
+    .instruction-image {
+        max-width: 700px; /* 在超大屏幕上进一步限制 */
+    }
+}
+
+/* 确保 instructions 容器能够容纳图片 */
+.instructions {
+    line-height: 1.6;
+    overflow-x: hidden; /* 防止横向滚动 */
+}
+
+/* 为小屏幕设备优化 */
+@media (max-width: 480px) {
+    .instruction-images {
+        gap: 10px;
+        margin: 10px 0;
+    }
+    
+    .instruction-image {
+        border-radius: 6px;
+    }
+}
